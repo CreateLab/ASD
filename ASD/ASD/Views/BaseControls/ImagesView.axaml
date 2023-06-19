@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:ASD.ViewModels"
+             xmlns:converters="clr-namespace:ASD.Converters"
+             xmlns:models="clr-namespace:ASD.Models"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:MainViewModel"
+             x:Class="ASD.Views.BaseControls.ImagesView">
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <viewModels:MainViewModel />
+    </Design.DataContext>
+    <UserControl.Resources>
+        <converters:Base64ImageConverter x:Key="Base64ImageConverter" />
+    </UserControl.Resources>
+    <ListBox ItemsSource="{Binding Images }">
+        <ListBox.DataTemplates>
+            <DataTemplate x:DataType="models:ImageModel">
+                <Image Stretch="None" Source="{Binding Base64Image, Converter={StaticResource Base64ImageConverter}}"></Image>
+            </DataTemplate>
+        </ListBox.DataTemplates>
+    </ListBox>
+</UserControl>

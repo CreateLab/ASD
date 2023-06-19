@@ -1,0 +1,12 @@
+C:\Users\f98f9\RiderProjects\ASD\IContracts\bin\Debug\net7.0\IContracts.deps.json
+C:\Users\f98f9\RiderProjects\ASD\IContracts\bin\Debug\net7.0\IContracts.dll
+C:\Users\f98f9\RiderProjects\ASD\IContracts\bin\Debug\net7.0\IContracts.pdb
+C:\Users\f98f9\RiderProjects\ASD\IContracts\obj\Debug\net7.0\IContracts.csproj.AssemblyReference.cache
+C:\Users\f98f9\RiderProjects\ASD\IContracts\obj\Debug\net7.0\IContracts.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\f98f9\RiderProjects\ASD\IContracts\obj\Debug\net7.0\IContracts.AssemblyInfoInputs.cache
+C:\Users\f98f9\RiderProjects\ASD\IContracts\obj\Debug\net7.0\IContracts.AssemblyInfo.cs
+C:\Users\f98f9\RiderProjects\ASD\IContracts\obj\Debug\net7.0\IContracts.csproj.CoreCompileInputs.cache
+C:\Users\f98f9\RiderProjects\ASD\IContracts\obj\Debug\net7.0\IContracts.dll
+C:\Users\f98f9\RiderProjects\ASD\IContracts\obj\Debug\net7.0\refint\IContracts.dll
+C:\Users\f98f9\RiderProjects\ASD\IContracts\obj\Debug\net7.0\IContracts.pdb
+C:\Users\f98f9\RiderProjects\ASD\IContracts\obj\Debug\net7.0\ref\IContracts.dll
