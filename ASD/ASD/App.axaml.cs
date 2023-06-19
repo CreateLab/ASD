@@ -1,3 +1,5 @@
+using System;
+using ASD.PlatformInterfaces;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
@@ -8,6 +10,14 @@ namespace ASD;
 
 public partial class App : Application
 {
+    public static ISaver Saver { get; private set; }
+
+    public static void SetSaver(ISaver saver)
+    {
+        if(Saver == null)
+            Saver = saver;
+    }
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);

@@ -6,13 +6,17 @@ namespace ASD.Dto;
 public class Txt2ImgDtoRequest
 {
     public const string? Txt2ImgUrl = "/sdapi/v1/txt2img";
-    public Txt2ImgDtoRequest(string? prompt, string? negativePrompt)
+
+    public Txt2ImgDtoRequest(string? prompt, string? negativePrompt, int? width = null, int? height = null)
     {
-      this.prompt = prompt;
-      this.negative_prompt = negativePrompt;
-      this.steps = 20;
+        this.prompt = prompt;
+        this.negative_prompt = negativePrompt;
+        this.width = width;
+        this.height = height;
+        this.steps = 20;
     }
-    
+
+
     /*public bool? enable_hr { get; set; }
     public int? denoising_strength { get; set; }
     public int? firstphase_width { get; set; }
@@ -26,6 +30,7 @@ public class Txt2ImgDtoRequest
     public string? hr_prompt { get; set; }
     public string? hr_negative_prompt { get; set; }*/
     public string? prompt { get; set; }
+
     /*public List<string?> styles { get; set; }
     public int? seed { get; set; }
     public int? subseed { get; set; }
@@ -36,9 +41,14 @@ public class Txt2ImgDtoRequest
     public int? batch_size { get; set; }
     public int? n_iter { get; set; }*/
     public int? steps { get; set; }
-    /*public int? cfg_scale { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? width { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? height { get; set; }
+
+    /*public int? cfg_scale { get; set; }
     public bool? restore_faces { get; set; }
     public bool? tiling { get; set; }
     public bool? do_not_save_samples { get; set; }
@@ -58,5 +68,5 @@ public class Txt2ImgDtoRequest
     public string? script_name { get; set; }
     public bool? send_images { get; set; }
     public bool? save_images { get; set; }*/
-   // public AlwaysonScripts alwayson_scripts { get; set; } not implemented
+    // public AlwaysonScripts alwayson_scripts { get; set; } not implemented
 }

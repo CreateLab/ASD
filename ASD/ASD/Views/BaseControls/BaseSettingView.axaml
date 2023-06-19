@@ -2,22 +2,24 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:ASD.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:MainViewModel"
              x:Class="ASD.Views.BaseControls.BaseSettingView">
     <UserControl.Styles>
         <Style Selector="RadioButton">
-            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Margin" Value="5" />
         </Style>
         <Style Selector="Slider">
-            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Margin" Value="5" />
         </Style>
     </UserControl.Styles>
     <Grid RowDefinitions="Auto, Auto,*">
-       <StackPanel Orientation="Horizontal">
-           <RadioButton GroupName="ImageSize">Square</RadioButton>
-           <RadioButton GroupName="ImageSize">Album</RadioButton>
-           <RadioButton GroupName="ImageSize">Portrait</RadioButton>
-       </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <RadioButton IsChecked="{Binding IsSquare}">Square</RadioButton>
+            <RadioButton IsChecked="{Binding IsLandscape}">Landscape</RadioButton>
+            <RadioButton IsChecked="{Binding IsPortrait}">Portrait</RadioButton>
+        </StackPanel>
         <Slider Grid.Row="1" Minimum="0" Maximum="4"></Slider>
-   </Grid>
+    </Grid>
 </UserControl>

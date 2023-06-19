@@ -19,7 +19,16 @@
     <ListBox ItemsSource="{Binding Images }">
         <ListBox.DataTemplates>
             <DataTemplate x:DataType="models:ImageModel">
-                <Image Stretch="None" Source="{Binding Base64Image, Converter={StaticResource Base64ImageConverter}}"></Image>
+                <Grid RowDefinitions="Auto,Auto">
+                    <Image Stretch="None"
+                           Source="{Binding Base64Image, Converter={StaticResource Base64ImageConverter}}">
+                    </Image>
+                    <Button x:CompileBindings="False" Grid.Row="1" Margin="5"
+                            Command="{Binding $parent[UserControl].DataContext.SaveImage}"
+                            CommandParameter="{Binding Id}">
+                        Save
+                    </Button>
+                </Grid>
             </DataTemplate>
         </ListBox.DataTemplates>
     </ListBox>

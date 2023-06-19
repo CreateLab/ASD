@@ -9,4 +9,8 @@ namespace ASD.Android;
     ConfigurationChanges = ConfigChanges.Orientation | ConfigChanges.ScreenSize | ConfigChanges.UiMode)]
 public class MainActivity : AvaloniaMainActivity
 {
+    public MainActivity()
+    {
+        App.SetSaver(new Impl.Saver());
+    }
 }
