@@ -89,11 +89,11 @@ public class MainViewModel : ViewModelBase
         Setup = ReactiveCommand.CreateFromTask(SetupAsync);
         SetOptions = ReactiveCommand.CreateFromTask(SetOptionsAsync);
         IsSquare = true;
-        /*Setup.Execute().Subscribe();
+        Setup.Execute().Subscribe();
 
         this.WhenAnyValue(x => x.SelectedSDModel)
             .Where(value => value != null && _isSetupEnd) // Optional: Only trigger when the property is not empty
-            .Subscribe(_ => SetOptions.Execute().Subscribe());*/
+            .Subscribe(_ => SetOptions.Execute().Subscribe());
     }
 
     private async Task SetOptionsAsync()

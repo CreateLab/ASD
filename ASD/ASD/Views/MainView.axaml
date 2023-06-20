@@ -12,7 +12,7 @@
         <ComboBox ItemsSource="{Binding Models}" SelectedItem="{Binding SelectedSDModel}">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Name}"></TextBlock>
+                    <TextBox Text="{Binding Name}"></TextBox>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
