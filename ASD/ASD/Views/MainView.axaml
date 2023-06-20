@@ -4,35 +4,22 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:ASD.ViewModels"
              xmlns:baseControls="clr-namespace:ASD.Views.BaseControls"
+             xmlns:img2ImgControls="clr-namespace:ASD.Views.Img2ImgControls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="ASD.Views.MainView"
              x:DataType="vm:MainViewModel">
-    <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainViewModel />
-    </Design.DataContext>
-
-    <UserControl.Styles>
-        <Style Selector="TextBox">
-            <Setter Property="Margin" Value="10"></Setter>
-        </Style>
-    </UserControl.Styles>
-
-    <Grid>
-        <Grid Name="HorisontalGrid" RowDefinitions="25*,75*" ColumnDefinitions="75*,25*">
-            <baseControls:PromptView Margin="10" />
-            <Button Grid.Column="1" Command="{Binding GenerateImages}" Margin="10">Generate</Button>
-            <baseControls:ImagesView Grid.Row="1" Margin="10" />
-            <baseControls:BaseSettingView Grid.Column="1" Grid.Row="1" Margin="10"></baseControls:BaseSettingView>
-        </Grid>
-
-        <Grid Name="VerticalGrid" RowDefinitions="Auto,Auto,Auto,*">
-            <baseControls:PromptView Margin="10" />
-            <Button Grid.Row="1" Command="{Binding GenerateImages}" Margin="10">Generate</Button>
-            <baseControls:BaseSettingView Grid.Row="2" Margin="10"></baseControls:BaseSettingView>
-            <baseControls:ImagesView Grid.Row="3" Margin="10" />
-        </Grid>
-
+    <Grid RowDefinitions="Auto,*">
+        <ComboBox ItemsSource="{Binding Models}" SelectedItem="{Binding SelectedSDModel}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}"></TextBlock>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <TabControl Grid.Row="1">
+            <TabItem Header="Txt2Img">
+                <img2ImgControls:Img2ImgView />
+            </TabItem>
+        </TabControl>
     </Grid>
 </UserControl>

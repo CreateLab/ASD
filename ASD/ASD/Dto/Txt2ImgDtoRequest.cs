@@ -5,8 +5,6 @@ namespace ASD.Dto;
 
 public class Txt2ImgDtoRequest
 {
-    public const string? Txt2ImgUrl = "/sdapi/v1/txt2img";
-
     public Txt2ImgDtoRequest(string? prompt, string? negativePrompt, int? width = null, int? height = null)
     {
         this.prompt = prompt;
