@@ -146,6 +146,11 @@ public class MainViewModel : ViewModelBase
                 model.height = 720;
                 model.width = 512;
             }
+            else
+            {
+                model.height = 512;
+                model.width = 512;
+            }
 
             var url = $"{UrlContst.ServerUrl}{UrlContst.Txt2ImgUrl}";
             var result = await url.PostJsonAsync(model, token).ReceiveJson<Txt2ImgDtoResponse>();
