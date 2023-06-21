@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 using ASD.Consts;
 using ASD.Dto;
 using ASD.Models;
+using ASD.Servises.ImageDimensions;
 using DynamicData;
 using Flurl;
 using Flurl.Http;
@@ -27,7 +29,20 @@ public class MainViewModel : ViewModelBase
     private bool _isPortrait;
     private bool _isLandscape;
 
+    private bool _justResize = true;
+    private bool _cropAndResize;
+    private bool _resizeAndFill;
+    private bool _resizeAndUpscale;
+
+    private string _imgFromImg2Img;
+
     private SDModel _selectedSDModel;
+
+
+    private int _imgFromImg2ImgWidth;
+    private int _imgFromImg2ImgHeight;
+
+    private double _denoisingStrength = 0.75;
 
     public ObservableCollection<ImageModel> Images { get; set; } = new();
     public ObservableCollection<SDModel> Models { get; set; } = new();
@@ -74,13 +89,64 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _selectedSDModel, value);
     }
 
+    public string ImgFromImg2Img
+    {
+        get => _imgFromImg2Img;
+        set => this.RaiseAndSetIfChanged(ref _imgFromImg2Img, value);
+    }
+
+    public int ImgFromImg2ImgWidth
+    {
+        get => _imgFromImg2ImgWidth;
+        set => this.RaiseAndSetIfChanged(ref _imgFromImg2ImgWidth, value);
+    }
+
+    public int ImgFromImg2ImgHeight
+    {
+        get => _imgFromImg2ImgHeight;
+        set => this.RaiseAndSetIfChanged(ref _imgFromImg2ImgHeight, value);
+    }
+    
+    public bool JustResize
+    {
+        get => _justResize;
+        set => this.RaiseAndSetIfChanged(ref _justResize, value);
+    }
+    
+    public bool CropAndResize
+    {
+        get => _cropAndResize;
+        set => this.RaiseAndSetIfChanged(ref _cropAndResize, value);
+    }
+
+    public bool ResizeAndFill
+    {
+        get => _resizeAndFill;
+        set => this.RaiseAndSetIfChanged(ref _resizeAndFill, value);
+    }
+    
+    public bool ResizeAndUpscale
+    {
+        get => _resizeAndUpscale;
+        set => this.RaiseAndSetIfChanged(ref _resizeAndUpscale, value);
+    }
+    
+    public double DenoisingStrength
+    {
+        get => _denoisingStrength;
+        set => this.RaiseAndSetIfChanged(ref _denoisingStrength, value);
+    }
+    
     public ReactiveCommand<Unit, Unit> GenerateImages { get; }
-
     public ReactiveCommand<int, Unit> SaveImage { get; }
-
     private ReactiveCommand<Unit, Unit> Setup { get; }
+    public ReactiveCommand<int, Unit> SendToImg2Img { get; }
 
+    public ReactiveCommand<Unit, Unit> LoadImage { get; }
+    
+    public ReactiveCommand<Unit,Unit> GenerateImagesFromImage { get; }
     private ReactiveCommand<Unit, Unit> SetOptions { get; }
+
 
     public MainViewModel()
     {
@@ -88,12 +154,93 @@ public class MainViewModel : ViewModelBase
         SaveImage = ReactiveCommand.CreateFromTask<int>(SaveImageAsync);
         Setup = ReactiveCommand.CreateFromTask(SetupAsync);
         SetOptions = ReactiveCommand.CreateFromTask(SetOptionsAsync);
+        SendToImg2Img = ReactiveCommand.Create<int>(SendToImg2ImgMethod);
+        LoadImage = ReactiveCommand.CreateFromTask(LoadImageAsync);
+        GenerateImagesFromImage = ReactiveCommand.CreateFromTask(GenerateImagesFromImageAsync);
         IsSquare = true;
         Setup.Execute().Subscribe();
 
         this.WhenAnyValue(x => x.SelectedSDModel)
             .Where(value => value != null && _isSetupEnd) // Optional: Only trigger when the property is not empty
             .Subscribe(_ => SetOptions.Execute().Subscribe());
+    }
+
+    private async Task GenerateImagesFromImageAsync()
+    {
+        var resizeMode = 0;
+        
+        if (JustResize)
+            resizeMode = 0;
+        else if (CropAndResize)
+            resizeMode = 1;
+        else if (ResizeAndFill)
+            resizeMode = 2;
+        else if (ResizeAndUpscale)
+            resizeMode = 3;
+        
+        var imgResponce = new ImgToImgDtoRequest
+        {
+            Height = ImgFromImg2ImgHeight,
+            Width = ImgFromImg2ImgWidth,
+            InitImages = new List<string>{ ImgFromImg2Img },
+            Prompt =  PositivePrompt,
+            NegativePrompt = NegativePrompt,
+            DenoisingStrength = DenoisingStrength,
+            ResizeMode = resizeMode
+        };
+
+        try
+        {
+
+     
+        var result = await $"{UrlContst.ServerUrl}{UrlContst.Img2ImgUrl}".PostJsonAsync(imgResponce).ReceiveJson<Txt2ImgDtoResponse>();
+        Images.Clear();
+        Images.AddRange(result.images.Select((x, i) => new ImageModel
+        {
+            Base64Image = x,
+            Id = i
+        }));
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
+    }
+
+    private async Task LoadImageAsync()
+    {
+        var image = await App.Loader?.LoadImageAsBase64();
+        if (image == null)
+            return;
+        ImgFromImg2Img = image;
+
+        var isSuccess = ImageHelper.TryGetDimensions(ImgFromImg2Img, out var size);
+        if (isSuccess)
+        {
+            ImgFromImg2ImgWidth = size.width;
+            ImgFromImg2ImgHeight = size.height;
+        }
+        else
+        {
+            ImgFromImg2ImgWidth = 512;
+            ImgFromImg2ImgHeight = 512;
+        }
+    }
+
+    private void SendToImg2ImgMethod(int obj)
+    {
+        ImgFromImg2Img = Images[obj].Base64Image;
+        var isSuccess = ImageHelper.TryGetDimensions(ImgFromImg2Img, out var size);
+        if (isSuccess)
+        {
+            ImgFromImg2ImgWidth = size.width;
+            ImgFromImg2ImgHeight = size.height;
+        }
+        else
+        {
+            ImgFromImg2ImgWidth = 512;
+            ImgFromImg2ImgHeight = 512;
+        }
     }
 
     private async Task SetOptionsAsync()

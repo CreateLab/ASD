@@ -12,8 +12,10 @@
         <viewModels:MainViewModel />
     </Design.DataContext>
     <Grid RowDefinitions="*,*,Auto">
-        <TextBox Watermark="Prompt" Text="{Binding  PositivePrompt}"></TextBox>
-        <TextBox Grid.Row="1" Watermark="Negative Prompt" Text="{Binding  NegativePrompt}"></TextBox>
+        <TextBox TextWrapping="Wrap"
+                 AcceptsReturn="True" Watermark="Prompt" Text="{Binding  PositivePrompt}"></TextBox>
+        <TextBox Grid.Row="1" TextWrapping="Wrap"
+                 AcceptsReturn="True" Watermark="Negative Prompt" Text="{Binding  NegativePrompt}"></TextBox>
     
     </Grid>
 </UserControl>

@@ -1,3 +1,4 @@
+using ASD.Views.Default;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -5,7 +6,7 @@ using Avalonia.Markup.Xaml;
 
 namespace ASD.Views.Txt2Img;
 
-public partial class Txt2ImgView : UserControl
+public partial class Txt2ImgView : BaseControl
 {
     public Txt2ImgView()
     {
@@ -13,23 +14,7 @@ public partial class Txt2ImgView : UserControl
         SizeChanged += SetSize;
     }
 
-    private void SetSize(object? sender, RoutedEventArgs e)
-    {
-        var horisontalGrid = this.FindControl<Grid>("HorisontalGrid");
-        var verticalGrid = this.FindControl<Grid>("VerticalGrid");
-        var boundsWidth = this.Bounds.Width;
-        var boundsHeight = this.Bounds.Height;
-        if (boundsWidth > boundsHeight)
-        {
-            horisontalGrid.IsVisible = true;
-            verticalGrid.IsVisible = false;
-        }
-        else
-        {
-            horisontalGrid.IsVisible = false;
-            verticalGrid.IsVisible = true;
-        }
-    }
+   
 
     private void InitializeComponent()
     {

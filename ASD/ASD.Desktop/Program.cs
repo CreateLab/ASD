@@ -13,6 +13,7 @@ class Program
     public static void Main(string[] args)
     {
         App.SetSaver(new Impl.Saver());
+        App.SetLoader(new Impl.Loader());
         BuildAvaloniaApp()
             .StartWithClassicDesktopLifetime(args);
         

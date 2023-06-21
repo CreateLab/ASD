@@ -1,5 +1,6 @@
 ﻿using Android.App;
 using Android.Content.PM;
+using Android.OS;
 using Avalonia.Android;
 
 namespace ASD.Android;
@@ -11,6 +12,14 @@ public class MainActivity : AvaloniaMainActivity
 {
     public MainActivity()
     {
+        
         App.SetSaver(new Impl.Saver());
+        App.SetLoader(new Impl.Loader());
+    }
+
+    protected override void OnCreate(Bundle savedInstanceState)
+    {
+        base.OnCreate(savedInstanceState);
+        Xamarin.Essentials.Platform.Init(this, savedInstanceState);
     }
 }

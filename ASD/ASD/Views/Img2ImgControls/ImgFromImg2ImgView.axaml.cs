@@ -1,17 +1,14 @@
-using ASD.Views.Default;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 namespace ASD.Views.Img2ImgControls;
 
-public partial class Img2ImgView : BaseControl
+public partial class ImgFromImg2ImgView : UserControl
 {
-    public Img2ImgView()
+    public ImgFromImg2ImgView()
     {
         InitializeComponent();
-        SizeChanged += SetSize;
     }
 
     private void InitializeComponent()

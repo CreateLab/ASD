@@ -10,12 +10,19 @@ namespace ASD;
 
 public partial class App : Application
 {
-    public static ISaver Saver { get; private set; }
+    internal static ISaver? Saver { get; private set; }
+    internal static ILoader? Loader { get; private set; }
 
     public static void SetSaver(ISaver saver)
     {
         if(Saver == null)
             Saver = saver;
+    }
+    
+    public static void SetLoader(ILoader loader)
+    {
+        if(Loader == null)
+            Loader = loader;
     }
 
     public override void Initialize()
