@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace ASD.Dto;
 
@@ -7,11 +8,11 @@ public class Txt2ImgDtoRequest
 {
     public Txt2ImgDtoRequest(string? prompt, string? negativePrompt, int? width = null, int? height = null)
     {
-        this.prompt = prompt;
-        this.negative_prompt = negativePrompt;
-        this.width = width;
-        this.height = height;
-        this.steps = 20;
+        this.Prompt = prompt;
+        this.NegativePrompt = negativePrompt;
+        this.Width = width;
+        this.Height = height;
+        this.Steps = 20;
     }
 
 
@@ -27,7 +28,8 @@ public class Txt2ImgDtoRequest
     public string? hr_sampler_name { get; set; }
     public string? hr_prompt { get; set; }
     public string? hr_negative_prompt { get; set; }*/
-    public string? prompt { get; set; }
+    [JsonProperty("prompt")]
+    public string? Prompt { get; set; }
 
     /*public List<string?> styles { get; set; }
     public int? seed { get; set; }
@@ -36,23 +38,31 @@ public class Txt2ImgDtoRequest
     public int? seed_resize_from_h { get; set; }
     public int? seed_resize_from_w { get; set; }
     public string? sampler_name { get; set; }
-    public int? batch_size { get; set; }
+    
     public int? n_iter { get; set; }*/
-    public int? steps { get; set; }
+    
+    [JsonProperty("batch_size")]
+    public int? BatchSize { get; set; }
+    
+    [JsonProperty("steps")]
+    public int? Steps { get; set; }
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public int? width { get; set; }
+    [JsonProperty("width")]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? Width { get; set; }
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public int? height { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonProperty("height")]
+    public int? Height { get; set; }
 
     /*public int? cfg_scale { get; set; }
     public bool? restore_faces { get; set; }
     public bool? tiling { get; set; }
     public bool? do_not_save_samples { get; set; }
     public bool? do_not_save_grid { get; set; }*/
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? negative_prompt { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonProperty("negative_prompt")]
+    public string? NegativePrompt { get; set; }
     /*public int? eta { get; set; }
     public int? s_min_uncond { get; set; }
     public int? s_churn { get; set; }

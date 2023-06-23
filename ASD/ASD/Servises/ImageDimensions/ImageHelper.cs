@@ -33,6 +33,21 @@ public static class ImageHelper
             }
         }
         
+        public static bool TryGetDimensions(byte[] bytes, out Size dimensions)
+        {
+            try
+            {
+                using var br = new BinaryReader(new MemoryStream(bytes));
+                dimensions = GetDimensions(br);
+                return true;
+            }
+            catch (ArgumentException)
+            {
+                dimensions = default;
+                return false;
+            }
+        }
+        
         public static Size GetDimensions(string base64string)
         {
             using BinaryReader binaryReader = new BinaryReader(new MemoryStream(Convert.FromBase64String(base64string)));

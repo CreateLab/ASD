@@ -11,8 +11,8 @@ public class Base64ImageConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is not string base64Image) return null;
-        var byteArray = System.Convert.FromBase64String(base64Image);
+        if (value is not byte[] byteArray) return null;
+     
         using var stream = new MemoryStream(byteArray);
         // Create a new BitmapImage
         var image = new Bitmap(stream);

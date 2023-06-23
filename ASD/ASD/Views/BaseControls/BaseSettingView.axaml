@@ -20,6 +20,11 @@
             <RadioButton IsChecked="{Binding IsLandscape}">Landscape</RadioButton>
             <RadioButton IsChecked="{Binding IsPortrait}">Portrait</RadioButton>
         </StackPanel>
-        <Slider Grid.Row="1" Minimum="0" Maximum="4"></Slider>
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto">
+            <Label>Count:</Label>
+            <Slider Grid.Column="1" Minimum="1" Maximum="20" Value="{Binding Count}" TickFrequency="2">
+            </Slider>
+            <CheckBox Grid.Column="2" IsChecked="{Binding IsSizeUsed}">Use Size</CheckBox>
+        </Grid>
     </Grid>
 </UserControl>

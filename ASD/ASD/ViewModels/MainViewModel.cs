@@ -23,7 +23,7 @@ public class MainViewModel : ViewModelBase
 
     private string _positivePrompt;
     private string _negativePrompt;
-    private int _count;
+    private int _count = 4;
 
     private bool _isSquare = true;
     private bool _isPortrait;
@@ -34,16 +34,20 @@ public class MainViewModel : ViewModelBase
     private bool _resizeAndFill;
     private bool _resizeAndUpscale;
 
-    private string _imgFromImg2Img;
+    private byte[] _imgFromImg2Img;
 
     private SDModel _selectedSDModel;
 
+    private ImageModel _selectedImage;
 
-    private int _imgFromImg2ImgWidth;
-    private int _imgFromImg2ImgHeight;
+    private int _imgFromImg2ImgWidth = 512;
+    private int _imgFromImg2ImgHeight = 512;
 
     private double _denoisingStrength = 0.75;
 
+    private byte[] _previewImage;
+
+    public bool _isSizeUsed;
     public ObservableCollection<ImageModel> Images { get; set; } = new();
     public ObservableCollection<SDModel> Models { get; set; } = new();
 
@@ -51,6 +55,16 @@ public class MainViewModel : ViewModelBase
     {
         get => _positivePrompt;
         set => this.RaiseAndSetIfChanged(ref _positivePrompt, value);
+    }
+
+    public ImageModel SelectedImage
+    {
+        get => _selectedImage;
+        set
+        {
+            PreviewImage = value.Base64Image;
+            this.RaiseAndSetIfChanged(ref _selectedImage, value);
+        }
     }
 
     public string NegativePrompt
@@ -89,7 +103,7 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _selectedSDModel, value);
     }
 
-    public string ImgFromImg2Img
+    public byte[] ImgFromImg2Img
     {
         get => _imgFromImg2Img;
         set => this.RaiseAndSetIfChanged(ref _imgFromImg2Img, value);
@@ -106,13 +120,13 @@ public class MainViewModel : ViewModelBase
         get => _imgFromImg2ImgHeight;
         set => this.RaiseAndSetIfChanged(ref _imgFromImg2ImgHeight, value);
     }
-    
+
     public bool JustResize
     {
         get => _justResize;
         set => this.RaiseAndSetIfChanged(ref _justResize, value);
     }
-    
+
     public bool CropAndResize
     {
         get => _cropAndResize;
@@ -124,28 +138,41 @@ public class MainViewModel : ViewModelBase
         get => _resizeAndFill;
         set => this.RaiseAndSetIfChanged(ref _resizeAndFill, value);
     }
-    
+
     public bool ResizeAndUpscale
     {
         get => _resizeAndUpscale;
         set => this.RaiseAndSetIfChanged(ref _resizeAndUpscale, value);
     }
-    
+
     public double DenoisingStrength
     {
         get => _denoisingStrength;
         set => this.RaiseAndSetIfChanged(ref _denoisingStrength, value);
     }
-    
+
+    public byte[] PreviewImage
+    {
+        get => _previewImage;
+        set => this.RaiseAndSetIfChanged(ref _previewImage, value);
+    }
+
+    public bool IsSizeUsed
+    {
+        get => _isSizeUsed;
+        set => this.RaiseAndSetIfChanged(ref _isSizeUsed, value);
+    }
+
     public ReactiveCommand<Unit, Unit> GenerateImages { get; }
     public ReactiveCommand<int, Unit> SaveImage { get; }
     private ReactiveCommand<Unit, Unit> Setup { get; }
     public ReactiveCommand<int, Unit> SendToImg2Img { get; }
 
     public ReactiveCommand<Unit, Unit> LoadImage { get; }
-    
-    public ReactiveCommand<Unit,Unit> GenerateImagesFromImage { get; }
+
+    public ReactiveCommand<Unit, Unit> GenerateImagesFromImage { get; }
     private ReactiveCommand<Unit, Unit> SetOptions { get; }
+   
 
 
     public MainViewModel()
@@ -168,7 +195,7 @@ public class MainViewModel : ViewModelBase
     private async Task GenerateImagesFromImageAsync()
     {
         var resizeMode = 0;
-        
+
         if (JustResize)
             resizeMode = 0;
         else if (CropAndResize)
@@ -177,13 +204,13 @@ public class MainViewModel : ViewModelBase
             resizeMode = 2;
         else if (ResizeAndUpscale)
             resizeMode = 3;
-        
+
         var imgResponce = new ImgToImgDtoRequest
         {
             Height = ImgFromImg2ImgHeight,
             Width = ImgFromImg2ImgWidth,
-            InitImages = new List<string>{ ImgFromImg2Img },
-            Prompt =  PositivePrompt,
+            InitImages = new List<string> { Convert.ToBase64String(ImgFromImg2Img) },
+            Prompt = PositivePrompt,
             NegativePrompt = NegativePrompt,
             DenoisingStrength = DenoisingStrength,
             ResizeMode = resizeMode
@@ -191,15 +218,15 @@ public class MainViewModel : ViewModelBase
 
         try
         {
-
-     
-        var result = await $"{UrlContst.ServerUrl}{UrlContst.Img2ImgUrl}".PostJsonAsync(imgResponce).ReceiveJson<Txt2ImgDtoResponse>();
-        Images.Clear();
-        Images.AddRange(result.images.Select((x, i) => new ImageModel
-        {
-            Base64Image = x,
-            Id = i
-        }));
+            var result = await $"{UrlContst.ServerUrl}{UrlContst.Img2ImgUrl}".PostJsonAsync(imgResponce)
+                .ReceiveJson<Txt2ImgDtoResponse>();
+            Images.Clear();
+            Images.AddRange(result.images.Select((x, i) => new ImageModel
+            {
+                Base64Image = Convert.FromBase64String(x),
+                Id = i
+            }));
+            SelectedImage = Images.FirstOrDefault();
         }
         catch (Exception e)
         {
@@ -212,7 +239,7 @@ public class MainViewModel : ViewModelBase
         var image = await App.Loader?.LoadImageAsBase64();
         if (image == null)
             return;
-        ImgFromImg2Img = image;
+        ImgFromImg2Img =  Convert.FromBase64String(image);
 
         var isSuccess = ImageHelper.TryGetDimensions(ImgFromImg2Img, out var size);
         if (isSuccess)
@@ -229,8 +256,8 @@ public class MainViewModel : ViewModelBase
 
     private void SendToImg2ImgMethod(int obj)
     {
-        ImgFromImg2Img = Images[obj].Base64Image;
-        var isSuccess = ImageHelper.TryGetDimensions(ImgFromImg2Img, out var size);
+       
+        var isSuccess = ImageHelper.TryGetDimensions(SelectedImage.Base64Image, out var size);
         if (isSuccess)
         {
             ImgFromImg2ImgWidth = size.width;
@@ -241,6 +268,8 @@ public class MainViewModel : ViewModelBase
             ImgFromImg2ImgWidth = 512;
             ImgFromImg2ImgHeight = 512;
         }
+        
+        ImgFromImg2Img = SelectedImage.Base64Image;
     }
 
     private async Task SetOptionsAsync()
@@ -270,7 +299,7 @@ public class MainViewModel : ViewModelBase
 
     private async Task SaveImageAsync(int id)
     {
-        await App.Saver.SaveImage("image.png", Convert.FromBase64String(Images[id].Base64Image),
+        await App.Saver.SaveImage($@"image_{Guid.NewGuid()}.png", SelectedImage.Base64Image,
             CancellationToken.None);
     }
 
@@ -285,32 +314,52 @@ public class MainViewModel : ViewModelBase
 
             if (IsLandscape)
             {
-                model.height = 512;
-                model.width = 720;
+                model.Height = 512;
+                model.Width = 720;
             }
             else if (IsPortrait)
             {
-                model.height = 720;
-                model.width = 512;
+                model.Height = 720;
+                model.Width = 512;
             }
             else
             {
-                model.height = 512;
-                model.width = 512;
+                model.Height = 512;
+                model.Width = 512;
             }
 
+
+            model.BatchSize = _isSizeUsed ? _count : 1;
+
+            var iteration = !_isSizeUsed ? _count : 1;
+            
             var url = $"{UrlContst.ServerUrl}{UrlContst.Txt2ImgUrl}";
-            var result = await url.PostJsonAsync(model, token).ReceiveJson<Txt2ImgDtoResponse>();
-            Images.Clear();
-            Images.AddRange(result.images.Select((x, i) => new ImageModel
+            var imagesCollection = new List<string>();
+            for(var i = 0 ; i < iteration; i++)
             {
-                Base64Image = x,
+                var receiveJson = await url.PostJsonAsync(model, token).ReceiveJson<Txt2ImgDtoResponse>();
+                imagesCollection.AddRange(receiveJson.images);
+            }
+            
+          
+            Images.Clear();
+            Images.AddRange(imagesCollection.Select((x, i) => new ImageModel
+            {
+                Base64Image =  Convert.FromBase64String(x),
                 Id = i
             }));
+
+            SelectedImage = Images.FirstOrDefault();
         }
         catch (Exception e)
         {
             throw;
         }
+    }
+
+    public void DoubleProportions()
+    {
+        ImgFromImg2ImgHeight *= 2;
+        ImgFromImg2ImgWidth *= 2;
     }
 }

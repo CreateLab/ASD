@@ -5,6 +5,7 @@
              xmlns:viewModels="clr-namespace:ASD.ViewModels"
              xmlns:converters="clr-namespace:ASD.Converters"
              xmlns:models="clr-namespace:ASD.Models"
+             xmlns:baseControls="clr-namespace:ASD.Views.BaseControls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:MainViewModel"
              x:Class="ASD.Views.BaseControls.ImagesView">
@@ -13,28 +14,48 @@
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <viewModels:MainViewModel />
     </Design.DataContext>
+    <UserControl.Styles>
+        <Style Selector="Button">
+            <Setter Property="Margin" Value="5"></Setter>
+        </Style>
+    </UserControl.Styles>
     <UserControl.Resources>
         <converters:Base64ImageConverter x:Key="Base64ImageConverter" />
     </UserControl.Resources>
-    <ListBox ItemsSource="{Binding Images }" MaxWidth="720">
-        <ListBox.DataTemplates>
-            <DataTemplate x:DataType="models:ImageModel">
-                <Grid RowDefinitions="Auto,Auto, Auto">
-                    <Image Stretch="Uniform" MaxHeight="720" MaxWidth="720"
-                           Source="{Binding Base64Image, Converter={StaticResource Base64ImageConverter}}">
-                    </Image>
-                    <Button x:CompileBindings="False" Grid.Row="1" Margin="5"
-                            Command="{Binding $parent[UserControl].DataContext.SaveImage}"
-                            CommandParameter="{Binding Id}">
-                        Save
-                    </Button>
-                    <Button x:CompileBindings="False" Grid.Row="2" Margin="5"
-                            Command="{Binding $parent[UserControl].DataContext.SendToImg2Img}"
-                            CommandParameter="{Binding Id}">
-                        To Img2Img
-                    </Button>
-                </Grid>
-            </DataTemplate>
-        </ListBox.DataTemplates>
-    </ListBox>
+    <Grid RowDefinitions="*,Auto" ColumnDefinitions="*,Auto,Auto,*">
+        <Image Name="Image" Grid.Column="1" MaxHeight="720" MaxWidth="720"
+               Source="{Binding PreviewImage, Converter={StaticResource Base64ImageConverter}}">
+
+        </Image>
+        <StackPanel Grid.Column="2" Orientation="Vertical" IsVisible="{Binding !!PreviewImage}">
+            <Button x:CompileBindings="False"
+                    Command="{Binding SaveImage}"
+                    CommandParameter="{Binding Id}">
+                Save
+            </Button>
+            <Button x:CompileBindings="False"
+                    Command="{Binding SendToImg2Img}"
+                    CommandParameter="{Binding Id}">
+                To Img2Img
+            </Button>
+            <Button x:CompileBindings="False" Command="{Binding $parent[baseControls:ImagesView].CopyCommand}">Copy</Button>
+        </StackPanel>
+        <ListBox Grid.Row="1" Grid.ColumnSpan="4" Grid.Column="0" ItemsSource="{Binding Images }" MaxWidth="720"
+                 ScrollViewer.HorizontalScrollBarVisibility="Auto" SelectedItem="{Binding SelectedImage}">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation='Horizontal' />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.DataTemplates>
+                <DataTemplate x:DataType="models:ImageModel">
+                    <Grid RowDefinitions="Auto,Auto, Auto">
+                        <Image Stretch="Uniform" MaxHeight="100" MaxWidth="100"
+                               Source="{Binding Base64Image, Converter={StaticResource Base64ImageConverter}}">
+                        </Image>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.DataTemplates>
+        </ListBox>
+    </Grid>
 </UserControl>
