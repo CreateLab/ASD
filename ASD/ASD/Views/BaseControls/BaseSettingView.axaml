@@ -22,8 +22,11 @@
         </StackPanel>
         <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto">
             <Label>Count:</Label>
-            <Slider Grid.Column="1" Minimum="1" Maximum="20" Value="{Binding Count}" TickFrequency="2">
-            </Slider>
+            <Grid Grid.Column="1" RowDefinitions="*,Auto">
+                <Slider Minimum="1" Maximum="20" Value="{Binding Count}" TickFrequency="2">
+                </Slider>
+                <TextBlock Grid.Row="1"></TextBlock>
+            </Grid>
             <CheckBox Grid.Column="2" IsChecked="{Binding IsSizeUsed}">Use Size</CheckBox>
         </Grid>
     </Grid>

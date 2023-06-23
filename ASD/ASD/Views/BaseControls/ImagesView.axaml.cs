@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Reactive;
 using System.Threading.Tasks;
+using ASD.ViewModels;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -78,5 +79,12 @@ public partial class ImagesView : UserControl
     {
         get => (ReactiveCommand<Unit, Unit>) GetValue(SaveCommandProperty);
         set => SetValue(SaveCommandProperty, value);
+    }
+
+    private void Image_OnTapped(object? sender, TappedEventArgs e)
+    {
+        var mainViewModel = this.DataContext as MainViewModel;
+        if (mainViewModel is null) return;
+        mainViewModel.IsDialogOpen = true;
     }
 }

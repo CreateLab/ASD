@@ -6,25 +6,47 @@
              xmlns:baseControls="clr-namespace:ASD.Views.BaseControls"
              xmlns:img2ImgControls="clr-namespace:ASD.Views.Img2ImgControls"
              xmlns:txt2Img="clr-namespace:ASD.Views.Txt2Img"
+             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+             xmlns:converters="clr-namespace:ASD.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="ASD.Views.MainView"
              x:DataType="vm:MainViewModel">
-    <Grid RowDefinitions="Auto,*">
-        <ComboBox ItemsSource="{Binding Models}" SelectedItem="{Binding SelectedSDModel}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBox Text="{Binding Name}" IsReadOnly="True"></TextBox>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
-        <TabControl Grid.Row="1">
+    
+    <UserControl.Styles>
+        <dialogHostAvalonia:DialogHostStyles />
+    </UserControl.Styles>
+    <UserControl.Resources>
+        <converters:Base64ImageConverter x:Key="Base64ImageConverter" />
+    </UserControl.Resources>
+    <dialogHostAvalonia:DialogHost CloseOnClickAway="True" IsOpen="{Binding IsDialogOpen, Mode=TwoWay}">
+        <dialogHostAvalonia:DialogHost.DialogContent>
+            <Grid>
+                <Grid RowDefinitions="Auto,*" IsVisible="{Binding IsAnyException}">
+                    <TextBlock>Wow, smth crush, try to restart app </TextBlock>
+                    <TextBlock Grid.Row="1" Text="{Binding ExceptionMessage}"></TextBlock>
+                </Grid>
+                <Image IsVisible="{Binding !IsAnyException}"  Source="{Binding PreviewImage, Converter={StaticResource Base64ImageConverter}}" />
+            </Grid>
+        </dialogHostAvalonia:DialogHost.DialogContent>
+        <Grid RowDefinitions="Auto,*">
+        
+            <ComboBox ItemsSource="{Binding Models}" SelectedItem="{Binding SelectedSDModel}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBox Text="{Binding Name}" IsReadOnly="True"></TextBox>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <TabControl Grid.Row="1">
           
-            <TabItem Header="Txt2Img">
-                <txt2Img:Txt2ImgView />
-            </TabItem>
-            <TabItem Header="Img2Img">
-                <img2ImgControls:Img2ImgView></img2ImgControls:Img2ImgView>
-            </TabItem>
-        </TabControl>
-    </Grid>
+                <TabItem Header="Txt2Img">
+                    <txt2Img:Txt2ImgView />
+                </TabItem>
+                <TabItem Header="Img2Img">
+                    <img2ImgControls:Img2ImgView></img2ImgControls:Img2ImgView>
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </dialogHostAvalonia:DialogHost>
+  
 </UserControl>

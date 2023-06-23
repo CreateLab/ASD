@@ -48,6 +48,12 @@ public class MainViewModel : ViewModelBase
     private byte[] _previewImage;
 
     public bool _isSizeUsed;
+
+    private string _exceptionMessage;
+
+    private bool _isAnyException;
+
+    private bool _isDialogOpen;
     public ObservableCollection<ImageModel> Images { get; set; } = new();
     public ObservableCollection<SDModel> Models { get; set; } = new();
 
@@ -163,6 +169,24 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _isSizeUsed, value);
     }
 
+    public string ExceptionMessage
+    {
+        get => _exceptionMessage;
+        set => this.RaiseAndSetIfChanged(ref _exceptionMessage, value);
+    }
+
+    public bool IsAnyException
+    {
+        get => _isAnyException;
+        set => this.RaiseAndSetIfChanged(ref _isAnyException, value);
+    }
+
+    public bool IsDialogOpen
+    {
+        get => _isDialogOpen;
+        set => this.RaiseAndSetIfChanged(ref _isDialogOpen, value);
+    }
+
     public ReactiveCommand<Unit, Unit> GenerateImages { get; }
     public ReactiveCommand<int, Unit> SaveImage { get; }
     private ReactiveCommand<Unit, Unit> Setup { get; }
@@ -172,8 +196,6 @@ public class MainViewModel : ViewModelBase
 
     public ReactiveCommand<Unit, Unit> GenerateImagesFromImage { get; }
     private ReactiveCommand<Unit, Unit> SetOptions { get; }
-   
-
 
     public MainViewModel()
     {
@@ -184,12 +206,40 @@ public class MainViewModel : ViewModelBase
         SendToImg2Img = ReactiveCommand.Create<int>(SendToImg2ImgMethod);
         LoadImage = ReactiveCommand.CreateFromTask(LoadImageAsync);
         GenerateImagesFromImage = ReactiveCommand.CreateFromTask(GenerateImagesFromImageAsync);
+
+        HandleExceptions();
+
         IsSquare = true;
         Setup.Execute().Subscribe();
 
         this.WhenAnyValue(x => x.SelectedSDModel)
             .Where(value => value != null && _isSetupEnd) // Optional: Only trigger when the property is not empty
             .Subscribe(_ => SetOptions.Execute().Subscribe());
+    }
+
+    private void HandleExceptions()
+    {
+        var commands = new List<IReactiveCommand>
+        {
+            GenerateImages,
+            SaveImage,
+            Setup,
+            SetOptions,
+            SendToImg2Img,
+            LoadImage,
+            GenerateImagesFromImage
+        };
+
+        var combinedExceptions = commands
+            .Select(command => command.ThrownExceptions)
+            .Merge();
+
+        combinedExceptions.Subscribe(exception =>
+        {
+            ExceptionMessage = exception.Message;
+            IsAnyException = true;
+            IsDialogOpen = true;
+        });
     }
 
     private async Task GenerateImagesFromImageAsync()
@@ -239,7 +289,7 @@ public class MainViewModel : ViewModelBase
         var image = await App.Loader?.LoadImageAsBase64();
         if (image == null)
             return;
-        ImgFromImg2Img =  Convert.FromBase64String(image);
+        ImgFromImg2Img = Convert.FromBase64String(image);
 
         var isSuccess = ImageHelper.TryGetDimensions(ImgFromImg2Img, out var size);
         if (isSuccess)
@@ -256,7 +306,6 @@ public class MainViewModel : ViewModelBase
 
     private void SendToImg2ImgMethod(int obj)
     {
-       
         var isSuccess = ImageHelper.TryGetDimensions(SelectedImage.Base64Image, out var size);
         if (isSuccess)
         {
@@ -268,7 +317,7 @@ public class MainViewModel : ViewModelBase
             ImgFromImg2ImgWidth = 512;
             ImgFromImg2ImgHeight = 512;
         }
-        
+
         ImgFromImg2Img = SelectedImage.Base64Image;
     }
 
@@ -332,20 +381,20 @@ public class MainViewModel : ViewModelBase
             model.BatchSize = _isSizeUsed ? _count : 1;
 
             var iteration = !_isSizeUsed ? _count : 1;
-            
+
             var url = $"{UrlContst.ServerUrl}{UrlContst.Txt2ImgUrl}";
             var imagesCollection = new List<string>();
-            for(var i = 0 ; i < iteration; i++)
+            for (var i = 0; i < iteration; i++)
             {
                 var receiveJson = await url.PostJsonAsync(model, token).ReceiveJson<Txt2ImgDtoResponse>();
                 imagesCollection.AddRange(receiveJson.images);
             }
-            
-          
+
+
             Images.Clear();
             Images.AddRange(imagesCollection.Select((x, i) => new ImageModel
             {
-                Base64Image =  Convert.FromBase64String(x),
+                Base64Image = Convert.FromBase64String(x),
                 Id = i
             }));
 

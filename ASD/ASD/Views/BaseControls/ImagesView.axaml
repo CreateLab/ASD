@@ -23,7 +23,7 @@
         <converters:Base64ImageConverter x:Key="Base64ImageConverter" />
     </UserControl.Resources>
     <Grid RowDefinitions="*,Auto" ColumnDefinitions="*,Auto,Auto,*">
-        <Image Name="Image" Grid.Column="1" MaxHeight="720" MaxWidth="720"
+        <Image Name="Image" Grid.Column="1" MaxHeight="720" MaxWidth="720" Tapped="Image_OnTapped"
                Source="{Binding PreviewImage, Converter={StaticResource Base64ImageConverter}}">
 
         </Image>
