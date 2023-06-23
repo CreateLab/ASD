@@ -268,7 +268,7 @@ public class MainViewModel : ViewModelBase
 
         try
         {
-            var result = await $"{UrlContst.ServerUrl}{UrlContst.Img2ImgUrl}".PostJsonAsync(imgResponce)
+            var result = await $"{UrlConst.ServerUrl}{UrlConst.Img2ImgUrl}".PostJsonAsync(imgResponce)
                 .ReceiveJson<Txt2ImgDtoResponse>();
             Images.Clear();
             Images.AddRange(result.images.Select((x, i) => new ImageModel
@@ -327,13 +327,13 @@ public class MainViewModel : ViewModelBase
         {
             SdModelCheckpoint = SelectedSDModel.Title
         };
-        await $"{UrlContst.ServerUrl}{UrlContst.OptionsUrl}".PostJsonAsync(options);
+        await $"{UrlConst.ServerUrl}{UrlConst.OptionsUrl}".PostJsonAsync(options);
     }
 
     private async Task SetupAsync()
     {
-        var options = await $"{UrlContst.ServerUrl}{UrlContst.OptionsUrl}".GetJsonAsync<OptionsDtoResponse>();
-        var models = await $"{UrlContst.ServerUrl}{UrlContst.SdModelUrl}".GetJsonAsync<ModelDtoResponse[]>();
+        var options = await $"{UrlConst.ServerUrl}{UrlConst.OptionsUrl}".GetJsonAsync<OptionsDtoResponse>();
+        var models = await $"{UrlConst.ServerUrl}{UrlConst.SdModelUrl}".GetJsonAsync<ModelDtoResponse[]>();
         Models.Clear();
         Models.AddRange(models.Select(x => new SDModel
             {
@@ -382,7 +382,7 @@ public class MainViewModel : ViewModelBase
 
             var iteration = !_isSizeUsed ? _count : 1;
 
-            var url = $"{UrlContst.ServerUrl}{UrlContst.Txt2ImgUrl}";
+            var url = $"{UrlConst.ServerUrl}{UrlConst.Txt2ImgUrl}";
             var imagesCollection = new List<string>();
             for (var i = 0; i < iteration; i++)
             {
