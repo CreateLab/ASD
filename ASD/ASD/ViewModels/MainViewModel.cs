@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -11,6 +12,7 @@ using ASD.Dto;
 using ASD.Enums;
 using ASD.Models;
 using ASD.Servises.ImageDimensions;
+using ASD.Views.InpaintControls;
 using DynamicData;
 using Flurl;
 using Flurl.Http;
@@ -34,7 +36,7 @@ public class MainViewModel : ViewModelBase
     private bool _cropAndResize;
     private bool _resizeAndFill;
     private bool _resizeAndUpscale;
-    
+
     private string _url = UrlConst.ServerUrl;
 
     private byte[] _imgFromImg2Img;
@@ -57,6 +59,7 @@ public class MainViewModel : ViewModelBase
     private PopupShowEnum _dialogType;
 
     private bool _isDialogOpen;
+    private IGetMask _mask;
     public ObservableCollection<ImageModel> Images { get; set; } = new();
     public ObservableCollection<SDModel> Models { get; set; } = new();
 
@@ -189,7 +192,7 @@ public class MainViewModel : ViewModelBase
         get => _isDialogOpen;
         set => this.RaiseAndSetIfChanged(ref _isDialogOpen, value);
     }
-    
+
     public string Url
     {
         get => _url;
@@ -205,7 +208,8 @@ public class MainViewModel : ViewModelBase
 
     public ReactiveCommand<Unit, Unit> GenerateImagesFromImage { get; }
     private ReactiveCommand<Unit, Unit> SetOptions { get; }
-   
+    public ReactiveCommand<Unit, Unit> GenerateImageFromMask { get; }
+
 
     public MainViewModel()
     {
@@ -216,6 +220,7 @@ public class MainViewModel : ViewModelBase
         SendToImg2Img = ReactiveCommand.Create<int>(SendToImg2ImgMethod);
         LoadImage = ReactiveCommand.CreateFromTask(LoadImageAsync);
         GenerateImagesFromImage = ReactiveCommand.CreateFromTask(GenerateImagesFromImageAsync);
+        GenerateImageFromMask = ReactiveCommand.CreateFromTask(GenerateImageFromMaskAsync);
 
         HandleExceptions();
 
@@ -225,6 +230,54 @@ public class MainViewModel : ViewModelBase
         this.WhenAnyValue(x => x.SelectedSDModel)
             .Where(value => value != null && _isSetupEnd) // Optional: Only trigger when the property is not empty
             .Subscribe(_ => SetOptions.Execute().Subscribe());
+    }
+
+    private async Task GenerateImageFromMaskAsync()
+    {
+        var resizeMode = 0;
+
+        if (JustResize)
+            resizeMode = 0;
+        else if (CropAndResize)
+            resizeMode = 1;
+        else if (ResizeAndFill)
+            resizeMode = 2;
+        else if (ResizeAndUpscale)
+            resizeMode = 3;
+
+        var imgResponce = new ImgToImgDtoRequest
+        {
+            Height = ImgFromImg2ImgHeight,
+            Width = ImgFromImg2ImgWidth,
+            InitImages = new List<string> { Convert.ToBase64String(ImgFromImg2Img) },
+            Prompt = PositivePrompt,
+            NegativePrompt = NegativePrompt,
+            DenoisingStrength = DenoisingStrength,
+            ResizeMode = resizeMode,
+            Mask = _mask.GetMask()
+        };
+
+        {
+            File.WriteAllBytes(@"C:\Users\f98f9\OneDrive\Рабочий стол\Image.png",  Convert.FromBase64String(imgResponce.InitImages.First()));
+            File.WriteAllBytes(@"C:\Users\f98f9\OneDrive\Рабочий стол\Mask.png", Convert.FromBase64String(imgResponce.Mask));
+        }
+
+        try
+        {
+            var result = await $"{Url}{UrlConst.Img2ImgUrl}".PostJsonAsync(imgResponce)
+                .ReceiveJson<Txt2ImgDtoResponse>();
+            Images.Clear();
+            Images.AddRange(result.images.Select((x, i) => new ImageModel
+            {
+                Base64Image = Convert.FromBase64String(x),
+                Id = i
+            }));
+            SelectedImage = Images.FirstOrDefault();
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 
     private void HandleExceptions()
@@ -237,7 +290,8 @@ public class MainViewModel : ViewModelBase
             SetOptions,
             SendToImg2Img,
             LoadImage,
-            GenerateImagesFromImage
+            GenerateImagesFromImage,
+            GenerateImageFromMask
         };
 
         var combinedExceptions = commands
@@ -349,7 +403,7 @@ public class MainViewModel : ViewModelBase
             {
                 Name = x.ModelName,
                 Title = x.Title
-            }).OrderBy(x=>x.Title)
+            }).OrderBy(x => x.Title)
             .ToList());
 
         SelectedSDModel = Models.FirstOrDefault(x => x.Title == options.SdModelCheckpoint);
@@ -420,5 +474,10 @@ public class MainViewModel : ViewModelBase
     {
         ImgFromImg2ImgHeight *= 2;
         ImgFromImg2ImgWidth *= 2;
+    }
+
+    public void SetMask(IGetMask getMask)
+    {
+        this._mask = getMask;
     }
 }

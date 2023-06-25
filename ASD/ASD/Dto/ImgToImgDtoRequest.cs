@@ -11,12 +11,13 @@ public class ImgToImgDtoRequest
 
     [JsonProperty("denoising_strength")] public double DenoisingStrength { get; set; }
 
+
+    [JsonProperty("mask")] public string Mask { get; set; }
     /*
     [JsonProperty("image_cfg_scale")]
     public int ImageCfgScale { get; set; }
 
-    [JsonProperty("mask")]
-    public string Mask { get; set; }
+ 
 
     [JsonProperty("mask_blur")]
     public int MaskBlur { get; set; }

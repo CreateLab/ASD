@@ -12,5 +12,6 @@
 
     <Application.Styles>
        <themes:MaterialTheme  PrimaryColor="Purple" SecondaryColor="Lime" />
+       <StyleInclude Source="Views/TemplatedControls/Mask.axaml"></StyleInclude>
     </Application.Styles>
 </Application>

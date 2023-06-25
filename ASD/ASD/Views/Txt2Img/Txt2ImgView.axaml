@@ -8,7 +8,7 @@
              x:DataType="viewModels:MainViewModel"
              x:Class="ASD.Views.Txt2Img.Txt2ImgView">
     <Grid>
-        <Grid Name="HorisontalGrid" RowDefinitions="Auto,*" ColumnDefinitions="75*,25*">
+        <Grid Name="HorizontalGrid" RowDefinitions="Auto,*" ColumnDefinitions="75*,25*">
             <baseControls:PromptView Margin="10" />
             <Button Grid.Column="1" Command="{Binding GenerateImages}" Margin="10">Generate</Button>
             <baseControls:ImagesView Grid.Row="1" Margin="10" />

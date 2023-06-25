@@ -1,0 +1,28 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:ASD.Views.TemplatedControls">
+    <Design.PreviewWith>
+        <controls:Mask />
+    </Design.PreviewWith>
+
+    <Style Selector="controls|Mask">
+        <!-- Set Defaults -->
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid RowDefinitions="*,Auto">
+                    <Image Name="Image" Source="{TemplateBinding ImageBackground}" Stretch="{TemplateBinding Stretch}"></Image>
+                    <Canvas x:Name="DrawCanvas" Background="Transparent" Height="{Binding #Image.Height}"
+                            Width="{Binding #Image.Bounds.Width}" />
+                    <!--<StackPanel Grid.Row="1" Orientation="Horizontal">
+                        <TextBlock Text="Canvas Height:" Margin="5"/>
+                        <TextBlock Text="{Binding #DrawCanvas.Bounds.Height}" Margin="5"/>
+                        <TextBlock Text="Canvas Width:" Margin="5"/>
+                        <TextBlock Text="{Binding #DrawCanvas.Bounds.Width}" Margin="5"/>
+                        <TextBlock Text="Pointer Width:" Margin="5"/>
+                        <TextBlock Text="{Binding TestWidth, Mode=TwoWay}" Margin="5"/>
+                    </StackPanel>-->
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>
