@@ -8,28 +8,36 @@
              xmlns:txt2Img="clr-namespace:ASD.Views.Txt2Img"
              xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              xmlns:converters="clr-namespace:ASD.Converters"
+             xmlns:model="clr-namespace:ASD.Enums"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="ASD.Views.MainView"
              x:DataType="vm:MainViewModel">
-    
+
     <UserControl.Styles>
         <dialogHostAvalonia:DialogHostStyles />
     </UserControl.Styles>
     <UserControl.Resources>
         <converters:Base64ImageConverter x:Key="Base64ImageConverter" />
+        <converters:DialogTypeConverter x:Key="DialogTypeConverter"></converters:DialogTypeConverter>
     </UserControl.Resources>
     <dialogHostAvalonia:DialogHost CloseOnClickAway="True" IsOpen="{Binding IsDialogOpen, Mode=TwoWay}">
         <dialogHostAvalonia:DialogHost.DialogContent>
             <Grid>
-                <Grid RowDefinitions="Auto,*" IsVisible="{Binding IsAnyException}">
+                <Grid RowDefinitions="Auto,*"
+                      IsVisible="{Binding DialogType, Converter={StaticResource DialogTypeConverter}, 
+                    ConverterParameter={x:Static model:PopupShowEnum.Exception}}">
                     <TextBlock>Wow, smth crush, try to restart app </TextBlock>
                     <TextBlock Grid.Row="1" Text="{Binding ExceptionMessage}"></TextBlock>
                 </Grid>
-                <Image IsVisible="{Binding !IsAnyException}"  Source="{Binding PreviewImage, Converter={StaticResource Base64ImageConverter}}" />
+                <Image  IsVisible="{Binding DialogType, Converter={StaticResource DialogTypeConverter}, 
+                    ConverterParameter={x:Static model:PopupShowEnum.Image}}"
+                        Source="{Binding PreviewImage, Converter={StaticResource Base64ImageConverter}}" />
+                <Grid  IsVisible="{Binding DialogType, Converter={StaticResource DialogTypeConverter}, 
+                    ConverterParameter={x:Static model:PopupShowEnum.Settings}}"></Grid>
             </Grid>
         </dialogHostAvalonia:DialogHost.DialogContent>
         <Grid RowDefinitions="Auto,*">
-        
+
             <ComboBox ItemsSource="{Binding Models}" SelectedItem="{Binding SelectedSDModel}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
@@ -38,7 +46,7 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
             <TabControl Grid.Row="1">
-          
+
                 <TabItem Header="Txt2Img">
                     <txt2Img:Txt2ImgView />
                 </TabItem>
@@ -48,5 +56,5 @@
             </TabControl>
         </Grid>
     </dialogHostAvalonia:DialogHost>
-  
+
 </UserControl>

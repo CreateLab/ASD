@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:ASD.ViewModels"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:MainViewModel"
              x:Class="ASD.Views.BaseControls.BaseSettingView">
@@ -14,20 +15,24 @@
             <Setter Property="Margin" Value="5" />
         </Style>
     </UserControl.Styles>
-    <Grid RowDefinitions="Auto, Auto,*">
-        <StackPanel Orientation="Horizontal">
-            <RadioButton IsChecked="{Binding IsSquare}">Square</RadioButton>
-            <RadioButton IsChecked="{Binding IsLandscape}">Landscape</RadioButton>
-            <RadioButton IsChecked="{Binding IsPortrait}">Portrait</RadioButton>
-        </StackPanel>
-        <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto">
-            <Label>Count:</Label>
-            <Grid Grid.Column="1" RowDefinitions="*,Auto">
-                <Slider Minimum="1" Maximum="20" Value="{Binding Count}" TickFrequency="2">
-                </Slider>
-                <TextBlock Grid.Row="1"></TextBlock>
+    <controls:Card>
+        <Grid RowDefinitions="Auto, Auto, Auto,*">
+            <StackPanel Orientation="Horizontal">
+                <RadioButton IsChecked="{Binding IsSquare}">Square</RadioButton>
+                <RadioButton IsChecked="{Binding IsLandscape}">Landscape</RadioButton>
+                <RadioButton IsChecked="{Binding IsPortrait}">Portrait</RadioButton>
+            </StackPanel>
+            <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+                <Label>Count:</Label>
+                <Grid Grid.Column="1" ColumnDefinitions="Auto,*">
+                    <TextBlock Text="{Binding Count}" Margin="5"></TextBlock>
+                    <Slider Name="Slider" Grid.Column="1" Minimum="1" Maximum="20" Value="{Binding Count}"
+                            TickFrequency="2">
+                    </Slider>
+
+                </Grid>
             </Grid>
-            <CheckBox Grid.Column="2" IsChecked="{Binding IsSizeUsed}">Use Size</CheckBox>
+            <CheckBox Grid.Row="2" IsChecked="{Binding IsSizeUsed}">Use Size</CheckBox>
         </Grid>
-    </Grid>
+    </controls:Card>
 </UserControl>

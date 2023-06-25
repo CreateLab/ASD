@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Reactive;
 using System.Threading.Tasks;
+using ASD.Enums;
 using ASD.ViewModels;
 using Avalonia;
 using Avalonia.Controls;
@@ -85,6 +86,7 @@ public partial class ImagesView : UserControl
     {
         var mainViewModel = this.DataContext as MainViewModel;
         if (mainViewModel is null) return;
+        mainViewModel.DialogType = PopupShowEnum.Image;
         mainViewModel.IsDialogOpen = true;
     }
 }

@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ASD.Consts;
 using ASD.Dto;
+using ASD.Enums;
 using ASD.Models;
 using ASD.Servises.ImageDimensions;
 using DynamicData;
@@ -33,6 +34,8 @@ public class MainViewModel : ViewModelBase
     private bool _cropAndResize;
     private bool _resizeAndFill;
     private bool _resizeAndUpscale;
+    
+    private string _url = UrlConst.ServerUrl;
 
     private byte[] _imgFromImg2Img;
 
@@ -51,7 +54,7 @@ public class MainViewModel : ViewModelBase
 
     private string _exceptionMessage;
 
-    private bool _isAnyException;
+    private PopupShowEnum _dialogType;
 
     private bool _isDialogOpen;
     public ObservableCollection<ImageModel> Images { get; set; } = new();
@@ -175,16 +178,22 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _exceptionMessage, value);
     }
 
-    public bool IsAnyException
+    public PopupShowEnum DialogType
     {
-        get => _isAnyException;
-        set => this.RaiseAndSetIfChanged(ref _isAnyException, value);
+        get => _dialogType;
+        set => this.RaiseAndSetIfChanged(ref _dialogType, value);
     }
 
     public bool IsDialogOpen
     {
         get => _isDialogOpen;
         set => this.RaiseAndSetIfChanged(ref _isDialogOpen, value);
+    }
+    
+    public string Url
+    {
+        get => _url;
+        set => this.RaiseAndSetIfChanged(ref _url, value);
     }
 
     public ReactiveCommand<Unit, Unit> GenerateImages { get; }
@@ -196,6 +205,7 @@ public class MainViewModel : ViewModelBase
 
     public ReactiveCommand<Unit, Unit> GenerateImagesFromImage { get; }
     private ReactiveCommand<Unit, Unit> SetOptions { get; }
+   
 
     public MainViewModel()
     {
@@ -237,7 +247,7 @@ public class MainViewModel : ViewModelBase
         combinedExceptions.Subscribe(exception =>
         {
             ExceptionMessage = exception.Message;
-            IsAnyException = true;
+            DialogType = PopupShowEnum.Exception;
             IsDialogOpen = true;
         });
     }
@@ -268,7 +278,7 @@ public class MainViewModel : ViewModelBase
 
         try
         {
-            var result = await $"{UrlConst.ServerUrl}{UrlConst.Img2ImgUrl}".PostJsonAsync(imgResponce)
+            var result = await $"{Url}{UrlConst.Img2ImgUrl}".PostJsonAsync(imgResponce)
                 .ReceiveJson<Txt2ImgDtoResponse>();
             Images.Clear();
             Images.AddRange(result.images.Select((x, i) => new ImageModel
@@ -327,19 +337,19 @@ public class MainViewModel : ViewModelBase
         {
             SdModelCheckpoint = SelectedSDModel.Title
         };
-        await $"{UrlConst.ServerUrl}{UrlConst.OptionsUrl}".PostJsonAsync(options);
+        await $"{Url}{UrlConst.OptionsUrl}".PostJsonAsync(options);
     }
 
     private async Task SetupAsync()
     {
-        var options = await $"{UrlConst.ServerUrl}{UrlConst.OptionsUrl}".GetJsonAsync<OptionsDtoResponse>();
-        var models = await $"{UrlConst.ServerUrl}{UrlConst.SdModelUrl}".GetJsonAsync<ModelDtoResponse[]>();
+        var options = await $"{Url}{UrlConst.OptionsUrl}".GetJsonAsync<OptionsDtoResponse>();
+        var models = await $"{Url}{UrlConst.SdModelUrl}".GetJsonAsync<ModelDtoResponse[]>();
         Models.Clear();
         Models.AddRange(models.Select(x => new SDModel
             {
                 Name = x.ModelName,
                 Title = x.Title
-            })
+            }).OrderBy(x=>x.Title)
             .ToList());
 
         SelectedSDModel = Models.FirstOrDefault(x => x.Title == options.SdModelCheckpoint);
@@ -382,7 +392,7 @@ public class MainViewModel : ViewModelBase
 
             var iteration = !_isSizeUsed ? _count : 1;
 
-            var url = $"{UrlConst.ServerUrl}{UrlConst.Txt2ImgUrl}";
+            var url = $"{Url}{UrlConst.Txt2ImgUrl}";
             var imagesCollection = new List<string>();
             for (var i = 0; i < iteration; i++)
             {

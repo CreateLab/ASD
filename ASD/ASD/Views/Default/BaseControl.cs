@@ -8,7 +8,7 @@ public class BaseControl: UserControl
     protected void SetSize(object? sender, RoutedEventArgs e)
     {
         var horisontalGrid = this.FindControl<Grid>("HorisontalGrid");
-        var verticalGrid = this.FindControl<Grid>("VerticalGrid");
+        var verticalGrid = this.FindControl<Control>("VerticalGrid");
         var boundsWidth = this.Bounds.Width;
         var boundsHeight = this.Bounds.Height;
         if (boundsWidth > boundsHeight)

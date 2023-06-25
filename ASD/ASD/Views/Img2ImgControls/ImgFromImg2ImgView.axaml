@@ -10,8 +10,11 @@
     <UserControl.Resources>
         <converters:Base64ImageConverter x:Key="Base64ImageConverter" />
     </UserControl.Resources>
-    <Grid RowDefinitions="*,Auto">
-        <Image Stretch="Uniform" Source="{Binding ImgFromImg2Img, Converter={StaticResource Base64ImageConverter} }"></Image>
-        <Button Grid.Row="1"  x:CompileBindings="False" Command="{Binding LoadImage}">Load</Button>
+    <Grid RowDefinitions="Auto,Auto">
+        <Button x:CompileBindings="False" Command="{Binding LoadImage}">Load</Button>
+        <Image Grid.Row="1" Stretch="Uniform" Source="{Binding ImgFromImg2Img, Converter={StaticResource Base64ImageConverter} }"
+               IsVisible="{Binding !!ImgFromImg2Img}">
+        </Image>
+
     </Grid>
 </UserControl>
