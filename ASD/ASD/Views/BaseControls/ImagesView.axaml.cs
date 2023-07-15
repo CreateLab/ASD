@@ -58,10 +58,10 @@ public partial class ImagesView : UserControl
         {
             bitmap.Save(stream);
             stream.Seek(0, SeekOrigin.Begin);
-            data.Set("Png", stream);
+            var array = stream.ToArray();
+            data.Set("Png", array);
             await clipboard.SetDataObjectAsync(data);
         }
-        var getData = await clipboard.GetDataAsync("Png");
     }
 
     public static readonly AvaloniaProperty<ReactiveCommand<Unit, Unit>> CopyCommandClickProperty =
