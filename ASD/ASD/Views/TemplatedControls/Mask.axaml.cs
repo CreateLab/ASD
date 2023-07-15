@@ -14,7 +14,7 @@ namespace ASD.Views.TemplatedControls;
 
 public class Mask : TemplatedControl
 {
-     private Canvas _canvas;
+    private Canvas _canvas;
     private Image _image;
     private List<List<Point>> _figuresList = new();
     private bool IsDrawing { get; set; }
@@ -82,7 +82,8 @@ public class Mask : TemplatedControl
         if (!IsDrawing) return;
         // Add the touch point to the list
         var pos = e.GetCurrentPoint(_canvas).Position;
-        if (_canvas.Bounds.Width < pos.X + Thickness || _canvas.Bounds.Height < pos.Y + Thickness|| pos.X -Thickness < 0 || pos.Y - Thickness < 0) return;
+        if (_canvas.Bounds.Width < pos.X + Thickness || _canvas.Bounds.Height < pos.Y + Thickness ||
+            pos.X - Thickness < 0 || pos.Y - Thickness < 0) return;
         _figuresList.Last().Add(pos);
         //TestWidth = (int)e.GetCurrentPoint(_canvas).Position.X;
         // Redraw the strokes on the canvas
@@ -129,8 +130,8 @@ public class Mask : TemplatedControl
 
     public string GetMask()
     {
-        var pixelSize = new Size(_image.Source.Size.Width, _image.Source.Size.Height);
-        using RenderTargetBitmap bitmap = new RenderTargetBitmap(pixelSize, new Vector(96, 96));
+        var pixelSize = new PixelSize((int)_image.Source.Size.Width, (int)_image.Source.Size.Height);
+        using var bitmap = new RenderTargetBitmap(pixelSize, new Vector(96, 96));
         using var ms = new MemoryStream();
         bitmap.Render(_canvas);
         bitmap.Save(ms);

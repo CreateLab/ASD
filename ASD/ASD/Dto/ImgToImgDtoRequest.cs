@@ -13,23 +13,23 @@ public class ImgToImgDtoRequest
 
 
     [JsonProperty("mask")] public string Mask { get; set; }
+
+    [JsonProperty("inpainting_fill")] public int? InpaintingFill { get; set; }
+
+    [JsonProperty("inpaint_full_res")] public bool? InpaintFullRes { get; set; }
+
+
     /*
     [JsonProperty("image_cfg_scale")]
     public int ImageCfgScale { get; set; }
 
- 
+  [JsonProperty("inpaint_full_res_padding")]
+    public int? InpaintFullResPadding { get; set; }
 
     [JsonProperty("mask_blur")]
     public int MaskBlur { get; set; }
 
-    [JsonProperty("inpainting_fill")]
-    public int InpaintingFill { get; set; }
-
-    [JsonProperty("inpaint_full_res")]
-    public bool InpaintFullRes { get; set; }
-
-    [JsonProperty("inpaint_full_res_padding")]
-    public int InpaintFullResPadding { get; set; }
+   
 
     [JsonProperty("inpainting_mask_invert")]
     public int InpaintingMaskInvert { get; set; }

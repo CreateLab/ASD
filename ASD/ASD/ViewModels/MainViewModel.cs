@@ -39,6 +39,11 @@ public class MainViewModel : ViewModelBase
 
     private string _url = UrlConst.ServerUrl;
 
+    private string _apiKey;
+
+    private string _settingUrl;
+    private string _settingApiKey;
+
     private byte[] _imgFromImg2Img;
 
     private SDModel _selectedSDModel;
@@ -199,6 +204,24 @@ public class MainViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _url, value);
     }
 
+    public string ApiKey
+    {
+        get => _apiKey;
+        set => this.RaiseAndSetIfChanged(ref _apiKey, value);
+    }
+
+    public string SettingUrl
+    {
+        get => _settingUrl;
+        set => this.RaiseAndSetIfChanged(ref _settingUrl, value);
+    }
+
+    public string SettingApiKey
+    {
+        get => _settingApiKey;
+        set => this.RaiseAndSetIfChanged(ref _settingApiKey, value);
+    }
+
     public ReactiveCommand<Unit, Unit> GenerateImages { get; }
     public ReactiveCommand<int, Unit> SaveImage { get; }
     private ReactiveCommand<Unit, Unit> Setup { get; }
@@ -209,6 +232,10 @@ public class MainViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> GenerateImagesFromImage { get; }
     private ReactiveCommand<Unit, Unit> SetOptions { get; }
     public ReactiveCommand<Unit, Unit> GenerateImageFromMask { get; }
+
+    public ReactiveCommand<Unit, Unit> OpenSettings { get; }
+
+    public ReactiveCommand<Unit, Unit> SaveSettings { get; }
 
 
     public MainViewModel()
@@ -221,6 +248,8 @@ public class MainViewModel : ViewModelBase
         LoadImage = ReactiveCommand.CreateFromTask(LoadImageAsync);
         GenerateImagesFromImage = ReactiveCommand.CreateFromTask(GenerateImagesFromImageAsync);
         GenerateImageFromMask = ReactiveCommand.CreateFromTask(GenerateImageFromMaskAsync);
+        OpenSettings = ReactiveCommand.CreateFromTask(OpenSettingsAsync);
+        SaveSettings = ReactiveCommand.CreateFromTask(SaveSettingsAsync);
 
         HandleExceptions();
 
@@ -231,6 +260,24 @@ public class MainViewModel : ViewModelBase
             .Where(value => value != null && _isSetupEnd) // Optional: Only trigger when the property is not empty
             .Subscribe(_ => SetOptions.Execute().Subscribe());
     }
+
+    private async Task SaveSettingsAsync()
+    {
+        Url = SettingUrl;
+        ApiKey = SettingApiKey;
+        IsDialogOpen = false;
+        await App.Setting?.SaveSetting(Url, ApiKey);
+    }
+
+    private Task OpenSettingsAsync()
+    {
+        SettingUrl = Url;
+        SettingApiKey = ApiKey;
+        DialogType = PopupShowEnum.Settings;
+        IsDialogOpen = true;
+        return Task.CompletedTask;
+    }
+
 
     private async Task GenerateImageFromMaskAsync()
     {
@@ -254,18 +301,16 @@ public class MainViewModel : ViewModelBase
             NegativePrompt = NegativePrompt,
             DenoisingStrength = DenoisingStrength,
             ResizeMode = resizeMode,
-            Mask = _mask.GetMask()
+            Mask = _mask.GetMask(),
+            InpaintingFill = 1,
+            InpaintFullRes = true
         };
 
-        {
-            File.WriteAllBytes(@"C:\Users\f98f9\OneDrive\Рабочий стол\Image.png",  Convert.FromBase64String(imgResponce.InitImages.First()));
-            File.WriteAllBytes(@"C:\Users\f98f9\OneDrive\Рабочий стол\Mask.png", Convert.FromBase64String(imgResponce.Mask));
-        }
 
         try
         {
-            var result = await $"{Url}{UrlConst.Img2ImgUrl}".PostJsonAsync(imgResponce)
-                .ReceiveJson<Txt2ImgDtoResponse>();
+            var result = await PostWithResult<Txt2ImgDtoResponse>(imgResponce, UrlConst.Img2ImgUrl, "POST", ApiKey);
+
             Images.Clear();
             Images.AddRange(result.images.Select((x, i) => new ImageModel
             {
@@ -291,7 +336,9 @@ public class MainViewModel : ViewModelBase
             SendToImg2Img,
             LoadImage,
             GenerateImagesFromImage,
-            GenerateImageFromMask
+            GenerateImageFromMask,
+            OpenSettings,
+            SaveSettings
         };
 
         var combinedExceptions = commands
@@ -332,8 +379,7 @@ public class MainViewModel : ViewModelBase
 
         try
         {
-            var result = await $"{Url}{UrlConst.Img2ImgUrl}".PostJsonAsync(imgResponce)
-                .ReceiveJson<Txt2ImgDtoResponse>();
+            var result = await PostWithResult<Txt2ImgDtoResponse>(imgResponce, UrlConst.Img2ImgUrl, "POST", ApiKey);
             Images.Clear();
             Images.AddRange(result.images.Select((x, i) => new ImageModel
             {
@@ -391,23 +437,37 @@ public class MainViewModel : ViewModelBase
         {
             SdModelCheckpoint = SelectedSDModel.Title
         };
-        await $"{Url}{UrlConst.OptionsUrl}".PostJsonAsync(options);
+
+        await Post(options, UrlConst.OptionsUrl, "POST", ApiKey);
     }
 
     private async Task SetupAsync()
     {
-        var options = await $"{Url}{UrlConst.OptionsUrl}".GetJsonAsync<OptionsDtoResponse>();
-        var models = await $"{Url}{UrlConst.SdModelUrl}".GetJsonAsync<ModelDtoResponse[]>();
-        Models.Clear();
-        Models.AddRange(models.Select(x => new SDModel
-            {
-                Name = x.ModelName,
-                Title = x.Title
-            }).OrderBy(x => x.Title)
-            .ToList());
+        var loadedSetting = await App.Setting?.LoadSetting();
+        Url = loadedSetting?.Url;
+        ApiKey = loadedSetting?.ApiKey;
 
-        SelectedSDModel = Models.FirstOrDefault(x => x.Title == options.SdModelCheckpoint);
-        _isSetupEnd = true;
+        if (Url == null || ApiKey == null) return;
+        try
+        {
+            var options = await PostWithResult<OptionsDtoResponse>(null, UrlConst.OptionsUrl, "GET", ApiKey);
+
+            var models = await PostWithResult<ModelDtoResponse[]>(null, UrlConst.SdModelUrl, "GET", ApiKey);
+            Models.Clear();
+            Models.AddRange(models.Select(x => new SDModel
+                {
+                    Name = x.ModelName,
+                    Title = x.Title
+                }).OrderBy(x => x.Title)
+                .ToList());
+
+            SelectedSDModel = Models.FirstOrDefault(x => x.Title == options.SdModelCheckpoint);
+            _isSetupEnd = true;
+        }
+        catch (Exception e)
+        {
+            // suppressed exception
+        }
     }
 
     private async Task SaveImageAsync(int id)
@@ -446,11 +506,11 @@ public class MainViewModel : ViewModelBase
 
             var iteration = !_isSizeUsed ? _count : 1;
 
-            var url = $"{Url}{UrlConst.Txt2ImgUrl}";
+
             var imagesCollection = new List<string>();
             for (var i = 0; i < iteration; i++)
             {
-                var receiveJson = await url.PostJsonAsync(model, token).ReceiveJson<Txt2ImgDtoResponse>();
+                var receiveJson = await PostWithResult<Txt2ImgDtoResponse>(model, UrlConst.Txt2ImgUrl, "POST", ApiKey);
                 imagesCollection.AddRange(receiveJson.images);
             }
 
@@ -479,5 +539,23 @@ public class MainViewModel : ViewModelBase
     public void SetMask(IGetMask getMask)
     {
         this._mask = getMask;
+    }
+
+    private Task<IFlurlResponse> Post(object data, string url, string method, string apiKey)
+    {
+        var requestBaseModel = new RequestBaseModel
+        {
+            Data = Newtonsoft.Json.JsonConvert.SerializeObject(data),
+            Url = url,
+            Method = method,
+            ApiKey = apiKey
+        };
+
+        return ("http://" + Url + "/postRedirect").PostJsonAsync(requestBaseModel);
+    }
+
+    private Task<T> PostWithResult<T>(object data, string url, string method, string apiKey)
+    {
+        return Post(data, url, method, apiKey).ReceiveJson<T>();
     }
 }

@@ -13,15 +13,17 @@ public partial class App : Application
     internal static ISaver? Saver { get; private set; }
     internal static ILoader? Loader { get; private set; }
 
+    internal static ISetting? Setting { get; private set; }
+
     public static void SetSaver(ISaver saver)
     {
-        if(Saver == null)
+        if (Saver == null)
             Saver = saver;
     }
-    
+
     public static void SetLoader(ILoader loader)
     {
-        if(Loader == null)
+        if (Loader == null)
             Loader = loader;
     }
 
@@ -48,5 +50,11 @@ public partial class App : Application
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    public static void SetSetting(ISetting setting)
+    {
+        if (Setting == null)
+            Setting = setting;
     }
 }

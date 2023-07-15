@@ -14,6 +14,7 @@ class Program
     {
         App.SetSaver(new Impl.Saver());
         App.SetLoader(new Impl.Loader());
+        App.SetSetting(new Impl.Setting());
         BuildAvaloniaApp()
             .StartWithClassicDesktopLifetime(args);
         

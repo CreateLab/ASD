@@ -34,21 +34,26 @@
                     IsVisible="{Binding DialogType, Converter={StaticResource DialogTypeConverter}, 
                     ConverterParameter={x:Static model:PopupShowEnum.Image}}"
                     Source="{Binding PreviewImage, Converter={StaticResource Base64ImageConverter}}" />
-                <Grid
-                    IsVisible="{Binding DialogType, Converter={StaticResource DialogTypeConverter}, 
+                <Grid RowDefinitions="Auto,Auto,Auto" Width="250"
+                      IsVisible="{Binding DialogType, Converter={StaticResource DialogTypeConverter}, 
                     ConverterParameter={x:Static model:PopupShowEnum.Settings}}">
+                    <TextBox Watermark="URl" Text="{Binding SettingUrl}" Margin="10" />
+                    <TextBox Grid.Row="1" Watermark="APIKEY" Text="{Binding SettingApiKey}" Margin="10" />
+                    <Button Grid.Row="2" Content="Ok" Command="{Binding SaveSettings}" />
                 </Grid>
             </Grid>
         </dialogHostAvalonia:DialogHost.DialogContent>
         <Grid RowDefinitions="Auto,*">
-
-            <ComboBox ItemsSource="{Binding Models}" SelectedItem="{Binding SelectedSDModel}">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <TextBox Text="{Binding Name}" IsReadOnly="True"/>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
+            <Grid ColumnDefinitions="*,Auto">
+                <ComboBox ItemsSource="{Binding Models}" SelectedItem="{Binding SelectedSDModel}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding Name}" IsReadOnly="True" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <Button Grid.Column="1" Command="{Binding OpenSettings}"></Button>
+            </Grid>
             <TabControl Grid.Row="1">
 
                 <TabItem Header="Txt2Img">
