@@ -12,7 +12,7 @@
     </UserControl.Resources>
     <Grid RowDefinitions="Auto,Auto">
         <Button x:CompileBindings="False" Command="{Binding LoadImage}">Load</Button>
-        <Image Grid.Row="1" Stretch="UniformToFill" Source="{Binding ImgFromImg2Img, Converter={StaticResource Base64ImageConverter} }"
+        <Image Grid.Row="1" Stretch="None" Source="{Binding ImgFromImg2Img, Converter={StaticResource Base64ImageConverter} }"
                IsVisible="{Binding !!ImgFromImg2Img}">
         </Image>
 

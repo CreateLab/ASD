@@ -551,7 +551,7 @@ public class MainViewModel : ViewModelBase
             ApiKey = apiKey
         };
 
-        return ("http://" + Url + "/postRedirect").PostJsonAsync(requestBaseModel);
+        return (Url + "/postRedirect").PostJsonAsync(requestBaseModel);
     }
 
     private Task<T> PostWithResult<T>(object data, string url, string method, string apiKey)

@@ -52,7 +52,7 @@
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
-                <Button Grid.Column="1" Command="{Binding OpenSettings}"></Button>
+                <Button Grid.Column="1" Command="{Binding OpenSettings}">Setting</Button>
             </Grid>
             <TabControl Grid.Row="1">
 
