@@ -30,10 +30,14 @@
                     <TextBlock>Wow, smth crush, try to restart app </TextBlock>
                     <TextBlock Grid.Row="1" Text="{Binding ExceptionMessage}"></TextBlock>
                 </Grid>
-                <Image
+                <Grid
                     IsVisible="{Binding DialogType, Converter={StaticResource DialogTypeConverter}, 
-                    ConverterParameter={x:Static model:PopupShowEnum.Image}}"
-                    Source="{Binding PreviewImage, Converter={StaticResource Base64ImageConverter}}" />
+                    ConverterParameter={x:Static model:PopupShowEnum.Image}}" RowDefinitions="Auto,*">
+                    <Button Margin="10" Command="{Binding SavePreview}">Save</Button>
+                    <Image Grid.Row="1"
+
+                           Source="{Binding PreviewImage, Converter={StaticResource Base64ImageConverter}}" />
+                </Grid>
                 <Grid RowDefinitions="Auto,Auto,Auto" Width="250"
                       IsVisible="{Binding DialogType, Converter={StaticResource DialogTypeConverter}, 
                     ConverterParameter={x:Static model:PopupShowEnum.Settings}}">

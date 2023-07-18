@@ -236,6 +236,8 @@ public class MainViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> OpenSettings { get; }
 
     public ReactiveCommand<Unit, Unit> SaveSettings { get; }
+    
+    public ReactiveCommand<Unit, Unit> SavePreview { get; }
 
 
     public MainViewModel()
@@ -250,6 +252,7 @@ public class MainViewModel : ViewModelBase
         GenerateImageFromMask = ReactiveCommand.CreateFromTask(GenerateImageFromMaskAsync);
         OpenSettings = ReactiveCommand.CreateFromTask(OpenSettingsAsync);
         SaveSettings = ReactiveCommand.CreateFromTask(SaveSettingsAsync);
+        SavePreview = ReactiveCommand.CreateFromTask(SavePreviewAsync);
 
         HandleExceptions();
 
@@ -259,6 +262,12 @@ public class MainViewModel : ViewModelBase
         this.WhenAnyValue(x => x.SelectedSDModel)
             .Where(value => value != null && _isSetupEnd) // Optional: Only trigger when the property is not empty
             .Subscribe(_ => SetOptions.Execute().Subscribe());
+    }
+
+    private async Task SavePreviewAsync()
+    {
+        await App.Saver.SaveImage($@"image_{Guid.NewGuid()}.png", PreviewImage,
+            CancellationToken.None);
     }
 
     private async Task SaveSettingsAsync()
@@ -338,7 +347,8 @@ public class MainViewModel : ViewModelBase
             GenerateImagesFromImage,
             GenerateImageFromMask,
             OpenSettings,
-            SaveSettings
+            SaveSettings,
+            SavePreview
         };
 
         var combinedExceptions = commands
