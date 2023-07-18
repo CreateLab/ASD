@@ -62,7 +62,7 @@
                 <TabItem Header="Img2Img">
                     <img2ImgControls:Img2ImgView />
                 </TabItem>
-                <TabItem Header="Inpaint">
+                <TabItem Header="Inpaint" IsEnabled="False">
                     <inpaintControls:InpaintView />
                 </TabItem>
             </TabControl>
