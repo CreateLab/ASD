@@ -453,6 +453,8 @@ public class MainViewModel : ViewModelBase
 
     private async Task SetupAsync()
     {
+        var l = App.Loader;
+        var s = App.Saver;
         var loadedSetting = await App.Setting?.LoadSetting();
         Url = loadedSetting?.Url;
         ApiKey = loadedSetting?.ApiKey;

@@ -21,6 +21,9 @@ public class SplashActivity : AvaloniaSplashActivity<App>
 
     protected override void OnCreate(Bundle? savedInstanceState)
     {
+        App.SetSaver(new Impl.Saver());
+        App.SetLoader(new Impl.Loader());
+        App.SetSetting(new Impl.Setting());
         base.OnCreate(savedInstanceState);
     }
 
